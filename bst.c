@@ -1,40 +1,14 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-// Todo: done :^^D
+// Todo
 
-// Node definition ok
-// createNode ok
-// printNode ok
-// insertNode ok (nonrecur)
-// removeNode ok (nonrecur)
-// preOrderPrint ok
-// inOrderPrint ok
-// postOrderPrint ok
-// levelOrderPrint ok
-// findMin ok
-// findMax ok
-// findNode ok (nonrecur)
-// getHeight ok
-
-// Stack definition ok
-// initializeStack ok - replaced with createStack ok
-// pop ok
-// push ok
-// stackIsFull ok
-// stackIsEmpty ok
-// printStack ok
-// freeStack added ok
-
-// Queue definition ok
-// initializeQueue replaced with createQueue ok
-// enqueue ok
-// dequeue ok
-// queueIsEmpty ok
-// queueIsFull added ok
-// printQueue ok
-// freeQueue added ok
-// obs.: turned the queue into a circular queue due to not being able to enqueue new nodes once the end of the queue reached the end of the array
+// getHeight
+// getBalanceFactor
+// rotateLeft
+// rotateRight
+// doubleRotateLeft
+// doubleRotateRight
 
 #define MAX_SIZE 10
 
