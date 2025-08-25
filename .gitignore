@@ -1,0 +1,15 @@
+# Code::Blocks project files to ignore
+*.layout
+*.depend
+bin/
+obj/
+
+# General build artifacts and executables
+*.o
+*.obj
+*.gch
+*.pch
+*.exe
+*.out
+*.dll
+*.so
