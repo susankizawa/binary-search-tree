@@ -10,6 +10,16 @@
 // doubleRotateLeft
 // doubleRotateRight
 
+/* como atualizar altura??
+/*
+typedef struct AVLNode{
+    int value;
+    int height;
+    struct AVLNode* right;
+    struct AVLNode* left;
+} Node;
+*/
+
 #define MAX_SIZE 10
 
 // Data structs
@@ -19,6 +29,7 @@ typedef struct Node{
     struct Node* left;
     struct Node* right;
 } Node;
+
 
 typedef struct Stack{
     Node* items[MAX_SIZE];
@@ -468,13 +479,16 @@ void levelOrderPrint(Node* root){
     enqueue(q, root);
 
     while(!queueIsEmpty(q)){
-        Node* current = dequeue(q);
-        if(current->left)
-            enqueue(q, current->left);
-        if(current->right)
-            enqueue(q, current->right);
-
-        printNode(current);
+        int levelSize = q->size;
+        for(int i = 0; i < levelSize; i++){
+            Node* current = dequeue(q);
+            if(current->left)
+                enqueue(q, current->left);
+            if(current->right)
+                enqueue(q, current->right);
+            printNode(current);
+        }
+        printf("\n");
     }
 
     printf("\n");
@@ -484,14 +498,16 @@ void levelOrderPrint(Node* root){
     return;
 }
 
+// AVL functions
+
 int getHeight(Node* root){
     if(root == NULL)
-        return 0;
+        return -1;
 
     Queue* q = createQueue();
 
     enqueue(q, root);
-    int height = 0;
+    int height = -1;
 
     while(!queueIsEmpty(q)){
         int levelSize = q->size;
@@ -510,8 +526,40 @@ int getHeight(Node* root){
     return height;
 }
 
+int getBalanceFactor(Node* root){
+    if(root == NULL)
+        return 0;
+
+    return (getHeight(root->right) - getHeight(root->left));
+}
+
+
+Node* rotateLeft(Node* p){
+    Node* z = p->right;
+    Node* T2 = z->left;
+
+    // rotates
+    z->left = p;
+    p->right = T2;
+
+    return z;
+}
+
+Node* rotateRight(Node* p){
+    Node* z = p->left;
+    Node* T2 = z->right;
+
+    // rotates
+    z->right = p;
+    p->left = T2;
+
+    return z;
+}
+
 
 int main(){
+    printf("height: %d\n", getHeight(NULL));
+
     Node* root = createNode(50);
 
     printf("height: %d\n", getHeight(root));
@@ -527,7 +575,13 @@ int main(){
 
     levelOrderPrint(root);
 
-    printf("height: %d\n", getHeight(root));
+    printf("\n");
+
+    Node* rotatedNode = findNodeNonRecur(root,10);
+
+    rotatedNode->right = rotateLeft(rotatedNode->right);
+
+    levelOrderPrint(root);
 
     return 0;
 }
