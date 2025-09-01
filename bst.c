@@ -534,7 +534,7 @@ int getBalanceFactor(Node* root){
 }
 
 
-Node* rotateLeft(Node* p){
+Node* rotateLeft(Node* p, Node* parent){
     Node* z = p->right;
     Node* T2 = z->left;
 
@@ -542,16 +542,30 @@ Node* rotateLeft(Node* p){
     z->left = p;
     p->right = T2;
 
+    // updates parent
+    if(parent)
+        if(parent->right == p)
+            parent->right = z;
+        else if(parent->left == p)
+            parent->left = z;
+
     return z;
 }
 
-Node* rotateRight(Node* p){
+Node* rotateRight(Node* p, Node* parent){
     Node* z = p->left;
     Node* T2 = z->right;
 
     // rotates
     z->right = p;
     p->left = T2;
+
+    // updates parent
+    if(parent)
+        if(parent->right == p)
+            parent->right = z;
+        else if(parent->left == p)
+            parent->left = z;
 
     return z;
 }
@@ -579,7 +593,9 @@ int main(){
 
     Node* rotatedNode = findNodeNonRecur(root,10);
 
-    rotatedNode->right = rotateLeft(rotatedNode->right);
+    rotateLeft(rotatedNode->right, rotatedNode);
+
+    //rotatedNode->right = rotateLeft(rotatedNode->right);
 
     levelOrderPrint(root);
 
