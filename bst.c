@@ -543,12 +543,18 @@ Node* rotateLeft(Node* p){
     z->left = p;
     p->right = T2;
 
+    // updates childs' parents
+    p->parent = z;
+    if(T2 != NULL)
+        T2->parent = p;
+
     // updates parent
-    if(parent)
+    if(parent){
         if(parent->right == p)
             parent->right = z;
         else if(parent->left == p)
             parent->left = z;
+    }
 
     return z;
 }
@@ -562,14 +568,30 @@ Node* rotateRight(Node* p){
     z->right = p;
     p->left = T2;
 
+    // updates childs' parents
+    p->parent = z;
+    if(T2 != NULL)
+        T2->parent = p;
+
     // updates parent
-    if(parent)
+    if(parent){
         if(parent->right == p)
             parent->right = z;
         else if(parent->left == p)
             parent->left = z;
+    }
 
     return z;
+}
+
+Node* doubleRotateLeft(Node* root){
+    rotateRight(root->right);
+    return rotateLeft(root);
+}
+
+Node* doubleRotateRight(Node* root){
+    rotateLeft(root->left);
+    return rotateRight(root);
 }
 
 
@@ -592,13 +614,25 @@ int main(){
     levelOrderPrint(root);
     printf("\n");
 
-    Node* rotatedNode = findNodeNonRecur(root,20);
-
-    rotateLeft(rotatedNode);
-
-    //rotatedNode->right = rotateLeft(rotatedNode->right);
+    rotateLeft(findNodeNonRecur(root,20));
 
     levelOrderPrint(root);
+    printf("\n");
+
+    rotateLeft(findNodeNonRecur(root,10));
+
+    levelOrderPrint(root);
+    printf("\n");
+
+    doubleRotateRight(findNodeNonRecur(root,80));
+
+    levelOrderPrint(root);
+    printf("\n");
+
+    rotateRight(findNodeNonRecur(root,90));
+
+    levelOrderPrint(root);
+    printf("\n");
 
     return 0;
 }
