@@ -3,22 +3,12 @@
 
 // Todo
 
-// getHeight
-// getBalanceFactor
+// getHeight ok
+// getBalanceFactor ok
 // rotateLeft
 // rotateRight
 // doubleRotateLeft
 // doubleRotateRight
-
-/* como atualizar altura??
-/*
-typedef struct AVLNode{
-    int value;
-    int height;
-    struct AVLNode* right;
-    struct AVLNode* left;
-} Node;
-*/
 
 #define MAX_SIZE 10
 
@@ -26,11 +16,9 @@ typedef struct AVLNode{
 
 typedef struct Node{
     int value;
-    struct Node* parent;
     struct Node* left;
     struct Node* right;
 } Node;
-
 
 typedef struct Stack{
     Node* items[MAX_SIZE];
@@ -49,7 +37,6 @@ typedef struct Queue{
 Node* createNode(int value){
     Node* newNode = (Node*)malloc(sizeof(Node));
     newNode->value = value;
-    newNode->parent = NULL;
     newNode->left = newNode->right = NULL;
     return newNode;
 }
@@ -208,6 +195,125 @@ void freeQueue(Queue* q){
 
 // Binary Search Tree
 
+Node* insertNodeNonRecur(Node* root, int value){
+    // create newNode with the defined value to be inserted in the tree
+    Node* newNode = createNode(value);
+
+    // if root is null, return newNode as the root of the new tree
+    if(root == NULL)
+        return newNode;
+
+    // goes through the tree looking for a free spot for the new node
+    Node* current = root;
+
+    while(1){
+        // if value is less than the current node's value move left
+        // if it's less move right
+        // if it's the same value, return the root of the tree without inserting
+        if(value < current->value){
+            // if left child exists, current is now the left child, else exit the loop
+            if(current->left)
+                current = current->left;
+            else
+                break;
+        } else if(value > current->value){
+            // if right child exists, current is now the right child, else exit the loop
+            if(current->right)
+                current = current->right;
+            else
+                break;
+        } else {
+            // frees newNode to have no duplicates
+            free(newNode);
+            return root;
+        }
+    }
+
+    // Inserts new node in the free spot
+    if(value < current->value){
+        current->left = newNode;
+    } else {
+        current->right = newNode;
+    }
+
+    return root;
+}
+
+Node* removeNodeNonRecur(Node* root, int value){
+    if(root == NULL)
+        return root;
+
+    // finds node to be removed and it's parent
+    Node* node = root;
+    Node* parent = NULL;
+
+    while(node != NULL && node->value != value){
+        parent = node;
+        if (value < node->value)
+            node = node->left;
+        else if(value > node->value)
+            node = node->right;
+    }
+
+    if(node == NULL)
+        return root;
+
+    // Case 1: No children
+    if(node->left == NULL && node->right == NULL){
+        // if parent exists, update parent
+        // else node must be root since it doesnt have a parent, therefore remove root
+        if(parent != NULL){
+            if(parent->left == node)
+                parent->left = NULL;
+            else
+                parent->right = NULL;
+        } else{
+            root = NULL;
+        }
+    }
+    // Case 2: 1 child
+    else if(node->left == NULL || node->right == NULL){
+        Node* child = (node->left) ? node->left : node->right;
+
+        // if parent exists, update parent
+        // else node must be root since it doesnt have a parent, therefore replace root
+        if(parent != NULL){
+            if(parent->left == node)
+                parent->left = child;
+            else
+                parent->right = child;
+        } else{
+            root = child;
+        }
+    }
+    // Case 3: 2 children
+    else{
+        // finds node of maximum value of left subtree and it's parent
+        Node* successor = node->left;
+        Node* successorParent = NULL;
+
+        while(successor->right != NULL){
+            successorParent = successor;
+            successor = successor->right;
+        }
+
+        // updates successor's parent if it exists
+        if(successorParent != NULL){
+            successorParent->right = successor->left;
+        } else{
+            node->left = successor->left;
+        }
+
+        node->value = successor->value;
+
+        free(successor);
+    }
+
+    free(node);
+
+    return root;
+}
+
 Node* findNodeNonRecur(Node* root, int value){
     Node* current = root;
 
@@ -255,123 +361,6 @@ Node* findMax(Node* root){
     }
 
     return current;
-}
-
-Node* insertNodeNonRecur(Node* root, int value){
-    // create newNode with the defined value to be inserted in the tree
-    Node* newNode = createNode(value);
-
-    // if root is null, return newNode as the root of the new tree
-    if(root == NULL)
-        return newNode;
-
-    // goes through the tree looking for a free spot for the new node
-    Node* current = root;
-
-    while(1){
-        // if value is less than the current node's value move left
-        // if it's less move right
-        // if it's the same value, return the root of the tree without inserting
-        if(value < current->value){
-            // if left child exists, current is now the left child, else exit the loop
-            if(current->left)
-                current = current->left;
-            else
-                break;
-        } else if(value > current->value){
-            // if right child exists, current is now the right child, else exit the loop
-            if(current->right)
-                current = current->right;
-            else
-                break;
-        } else {
-            // frees newNode to have no duplicates
-            free(newNode);
-            return root;
-        }
-    }
-
-    // Inserts new node in the free spot
-    newNode->parent = current;
-    if(value < current->value){
-        current->left = newNode;
-    } else {
-        current->right = newNode;
-    }
-
-    return root;
-}
-
-Node* removeNodeNonRecur(Node* root, int value){
-    if(root == NULL)
-        return root;
-
-    // finds node to be removed
-    Node* node = findNodeNonRecur(root, value);
-
-    if(node == NULL)
-        return root;
-
-    Node* parent = node->parent;
-
-    // Case 1: No children
-    if(node->left == NULL && node->right == NULL){
-        // if parent exists, update parent
-        // else node must be root since it doesnt have a parent, therefore remove root
-        if(parent != NULL){
-            if(parent->left == node)
-                parent->left = NULL;
-            else
-                parent->right = NULL;
-        } else{
-            root = NULL;
-        }
-
-        free(node);
-    }
-    // Case 2: 1 child
-    else if(node->left == NULL || node->right == NULL){
-        Node* child = (node->left) ? node->left : node->right;
-
-        child->parent = node->parent;
-
-        // if parent exists, update parent
-        // else node must be root since it doesnt have a parent, therefore replace root
-        if(parent != NULL){
-            if(parent->left == node)
-                parent->left = child;
-            else
-                parent->right = child;
-        } else{
-            root = child;
-        }
-
-        free(node);
-    }
-    // Case 3: 2 children
-    else{
-        // finds node of maximum value of left subtree (the in-order predecessor) and it's parent
-        Node* successor = findMax(node->left);
-        Node* successorParent = successor->parent;
-
-        // updates successor's parent if it exists
-        if(successorParent != NULL){
-            successorParent->right = successor->left;
-        } else{
-            node->left = successor->left;
-        }
-
-        // updates left child's parent if it exists
-        if(successor->left != NULL){
-            successor->left->parent = successorParent;
-        }
-
-        node->value = successor->value;
-
-        free(successor);
-    }
-
-    return root;
 }
 
 void preOrderPrint(Node* root){
@@ -479,16 +468,13 @@ void levelOrderPrint(Node* root){
     enqueue(q, root);
 
     while(!queueIsEmpty(q)){
-        int levelSize = q->size;
-        for(int i = 0; i < levelSize; i++){
-            Node* current = dequeue(q);
-            if(current->left)
-                enqueue(q, current->left);
-            if(current->right)
-                enqueue(q, current->right);
-            printNode(current);
-        }
-        printf("\n");
+        Node* current = dequeue(q);
+        if(current->left)
+            enqueue(q, current->left);
+        if(current->right)
+            enqueue(q, current->right);
+
+        printNode(current);
     }
 
     printf("\n");
@@ -498,16 +484,14 @@ void levelOrderPrint(Node* root){
     return;
 }
 
-// AVL functions
-
 int getHeight(Node* root){
     if(root == NULL)
-        return -1;
+        return 0;
 
     Queue* q = createQueue();
 
     enqueue(q, root);
-    int height = -1;
+    int height = 0;
 
     while(!queueIsEmpty(q)){
         int levelSize = q->size;
@@ -526,78 +510,8 @@ int getHeight(Node* root){
     return height;
 }
 
-int getBalanceFactor(Node* root){
-    if(root == NULL)
-        return 0;
-
-    return (getHeight(root->right) - getHeight(root->left));
-}
-
-
-Node* rotateLeft(Node* p){
-    Node* parent = p->parent;
-    Node* z = p->right;
-    Node* T2 = z->left;
-
-    // rotates
-    z->left = p;
-    p->right = T2;
-
-    // updates childs' parents
-    p->parent = z;
-    if(T2 != NULL)
-        T2->parent = p;
-
-    // updates parent
-    if(parent){
-        if(parent->right == p)
-            parent->right = z;
-        else if(parent->left == p)
-            parent->left = z;
-    }
-
-    return z;
-}
-
-Node* rotateRight(Node* p){
-    Node* parent = p->parent;
-    Node* z = p->left;
-    Node* T2 = z->right;
-
-    // rotates
-    z->right = p;
-    p->left = T2;
-
-    // updates childs' parents
-    p->parent = z;
-    if(T2 != NULL)
-        T2->parent = p;
-
-    // updates parent
-    if(parent){
-        if(parent->right == p)
-            parent->right = z;
-        else if(parent->left == p)
-            parent->left = z;
-    }
-
-    return z;
-}
-
-Node* doubleRotateLeft(Node* root){
-    rotateRight(root->right);
-    return rotateLeft(root);
-}
-
-Node* doubleRotateRight(Node* root){
-    rotateLeft(root->left);
-    return rotateRight(root);
-}
-
 
 int main(){
-    printf("height: %d\n", getHeight(NULL));
-
     Node* root = createNode(50);
 
     printf("height: %d\n", getHeight(root));
@@ -612,27 +526,8 @@ int main(){
     insertNodeNonRecur(root, 70);
 
     levelOrderPrint(root);
-    printf("\n");
 
-    rotateLeft(findNodeNonRecur(root,20));
-
-    levelOrderPrint(root);
-    printf("\n");
-
-    rotateLeft(findNodeNonRecur(root,10));
-
-    levelOrderPrint(root);
-    printf("\n");
-
-    doubleRotateRight(findNodeNonRecur(root,80));
-
-    levelOrderPrint(root);
-    printf("\n");
-
-    rotateRight(findNodeNonRecur(root,90));
-
-    levelOrderPrint(root);
-    printf("\n");
+    printf("height: %d\n", getHeight(root));
 
     return 0;
 }
