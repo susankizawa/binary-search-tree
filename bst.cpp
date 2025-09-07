@@ -1,5 +1,8 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+
+#include "raylib.h"
 
 // Todo
 
@@ -16,6 +19,7 @@
 
 typedef struct Node{
     int value;
+    struct Node* parent;
     struct Node* left;
     struct Node* right;
 } Node;
@@ -37,8 +41,58 @@ typedef struct Queue{
 Node* createNode(int value){
     Node* newNode = (Node*)malloc(sizeof(Node));
     newNode->value = value;
+    newNode->parent = NULL;
     newNode->left = newNode->right = NULL;
     return newNode;
+}
+
+Node* findNodeNonRecur(Node* root, int value){
+    Node* current = root;
+
+    while(current != NULL){
+        if (value < current->value){
+            current = current->left;
+        } else if(value > current->value){
+            current = current->right;
+        } else{
+            return current;
+        }
+    }
+
+    // 404: Value was not found!
+    return NULL;
+}
+
+Node* findMin(Node* root){
+    if(root == NULL)
+        return root;
+
+    Node* current = root;
+
+    while(1){
+        if(current->left)
+            current = current->left;
+        else
+            break;
+    }
+
+    return current;
+}
+
+Node* findMax(Node* root){
+    if(root == NULL)
+        return root;
+
+    Node* current = root;
+
+    while(1){
+        if(current->right)
+            current = current->right;
+        else
+            break;
+    }
+
+    return current;
 }
 
 void printNode(Node* n){
@@ -230,6 +284,7 @@ Node* insertNodeNonRecur(Node* root, int value){
     }
 
     // Inserts new node in the free spot
+    newNode->parent = current;
     if(value < current->value){
         current->left = newNode;
     } else {
@@ -244,19 +299,12 @@ Node* removeNodeNonRecur(Node* root, int value){
         return root;
 
     // finds node to be removed and it's parent
-    Node* node = root;
-    Node* parent = NULL;
-
-    while(node != NULL && node->value != value){
-        parent = node;
-        if (value < node->value)
-            node = node->left;
-        else if(value > node->value)
-            node = node->right;
-    }
+    Node* node = findNodeNonRecur(root, value);
 
     if(node == NULL)
         return root;
+
+    Node* parent = node->parent;
 
     // Case 1: No children
     if(node->left == NULL && node->right == NULL){
@@ -270,10 +318,14 @@ Node* removeNodeNonRecur(Node* root, int value){
         } else{
             root = NULL;
         }
+
+        free(node);
     }
     // Case 2: 1 child
     else if(node->left == NULL || node->right == NULL){
         Node* child = (node->left) ? node->left : node->right;
+
+        child->parent = node->parent;
 
         // if parent exists, update parent
         // else node must be root since it doesnt have a parent, therefore replace root
@@ -285,23 +337,25 @@ Node* removeNodeNonRecur(Node* root, int value){
         } else{
             root = child;
         }
+
+        free(node);
     }
     // Case 3: 2 children
     else{
-        // finds node of maximum value of left subtree and it's parent
-        Node* successor = node->left;
-        Node* successorParent = NULL;
-
-        while(successor->right != NULL){
-            successorParent = successor;
-            successor = successor->right;
-        }
+        // finds node of maximum value of left subtree (the in-order predecessor) and it's parent
+        Node* successor = findMax(node->left);
+        Node* successorParent = successor->parent;
 
         // updates successor's parent if it exists
         if(successorParent != NULL){
             successorParent->right = successor->left;
         } else{
             node->left = successor->left;
+        }
+
+        // updates left child's parent if it exists
+        if(successor->left != NULL){
+            successor->left->parent = successorParent;
         }
 
         node->value = successor->value;
@@ -314,54 +368,7 @@ Node* removeNodeNonRecur(Node* root, int value){
     return root;
 }
 
-Node* findNodeNonRecur(Node* root, int value){
-    Node* current = root;
 
-    while(current != NULL){
-        if (value < current->value){
-            current = current->left;
-        } else if(value > current->value){
-            current = current->right;
-        } else{
-            return current;
-        }
-    }
-
-    // 404: Value was not found!
-    return NULL;
-}
-
-Node* findMin(Node* root){
-    if(root == NULL)
-        return root;
-
-    Node* current = root;
-
-    while(1){
-        if(current->left)
-            current = current->left;
-        else
-            break;
-    }
-
-    return current;
-}
-
-Node* findMax(Node* root){
-    if(root == NULL)
-        return root;
-
-    Node* current = root;
-
-    while(1){
-        if(current->right)
-            current = current->right;
-        else
-            break;
-    }
-
-    return current;
-}
 
 void preOrderPrint(Node* root){
     if(root == NULL)
@@ -486,12 +493,12 @@ void levelOrderPrint(Node* root){
 
 int getHeight(Node* root){
     if(root == NULL)
-        return 0;
+        return -1;
 
     Queue* q = createQueue();
 
     enqueue(q, root);
-    int height = 0;
+    int height = -1;
 
     while(!queueIsEmpty(q)){
         int levelSize = q->size;
@@ -510,24 +517,156 @@ int getHeight(Node* root){
     return height;
 }
 
+int getBalanceFactor(Node* root){
+    if(root == NULL)
+        return 0;
+
+    return (getHeight(root->right) - getHeight(root->left));
+}
+
+
+Node* rotateLeft(Node* p){
+    Node* parent = p->parent;
+    Node* z = p->right;
+    Node* T2 = z->left;
+
+    // rotates
+    z->left = p;
+    p->right = T2;
+
+    // updates childs' parents
+    p->parent = z;
+    if(T2 != NULL)
+        T2->parent = p;
+
+    // updates parent
+    if(parent){
+        if(parent->right == p)
+            parent->right = z;
+        else if(parent->left == p)
+            parent->left = z;
+    }
+
+    return z;
+}
+
+Node* rotateRight(Node* p){
+    Node* parent = p->parent;
+    Node* z = p->left;
+    Node* T2 = z->right;
+
+    // rotates
+    z->right = p;
+    p->left = T2;
+
+    // updates childs' parents
+    p->parent = z;
+    if(T2 != NULL)
+        T2->parent = p;
+
+    // updates parent
+    if(parent){
+        if(parent->right == p)
+            parent->right = z;
+        else if(parent->left == p)
+            parent->left = z;
+    }
+
+    return z;
+}
+
+Node* doubleRotateLeft(Node* root){
+    rotateRight(root->right);
+    return rotateLeft(root);
+}
+
+Node* doubleRotateRight(Node* root){
+    rotateLeft(root->left);
+    return rotateRight(root);
+}
+
+void drawNode(Node* node, int posX, int posY, int fontSize){
+    char valString[20];
+    snprintf(valString, sizeof(valString), "%d", node->value);
+    int textHeight = fontSize;
+    int textWidth = MeasureText(valString, fontSize);
+    int textMax = std::max(textWidth, textHeight);
+    int radius = (textMax / 2) + 10; // radius is half of the larger dimension + some padding
+
+    // draws circle
+    DrawCircle(posX, posY, radius, LIGHTGRAY);
+    DrawCircleLines(posX, posY, radius, BLACK);
+
+    // draws centered text
+    DrawText(valString,
+             posX - (textWidth / 2),
+             posY - (textHeight / 2),
+             fontSize,
+             BLACK);
+
+    return;
+}
+
+void drawBST(Node* root, int posX, int posY, int offsetX, int offsetY, int fontSize){
+
+    if(root->left){
+        int leftChildX = posX - offsetX;
+        int leftChildY = posY + offsetY;
+
+        DrawLine(posX, posY, leftChildX, leftChildY, BLACK);
+        drawBST(root->left, leftChildX, leftChildY, offsetX / 2, offsetY, fontSize);
+    }
+    if(root->right){
+        int rightChildX = posX + offsetX;
+        int rightChildY = posY + offsetY;
+
+        DrawLine(posX, posY, rightChildX, rightChildY, BLACK);
+        drawBST(root->right, rightChildX, rightChildY, offsetX / 2, offsetY, fontSize);
+    }
+
+    drawNode(root, posX, posY, fontSize);
+
+    return;
+}
+
 
 int main(){
     Node* root = createNode(50);
 
-    printf("height: %d\n", getHeight(root));
-
     insertNodeNonRecur(root, 10);
-    insertNodeNonRecur(root, 20);
     insertNodeNonRecur(root, 90);
-    insertNodeNonRecur(root, 80);
+    insertNodeNonRecur(root, 20);
     insertNodeNonRecur(root, 30);
+    insertNodeNonRecur(root, 80);
     insertNodeNonRecur(root, 60);
     insertNodeNonRecur(root, 40);
     insertNodeNonRecur(root, 70);
 
-    levelOrderPrint(root);
+    rotateLeft(findNodeNonRecur(root, 20));
+    rotateLeft(findNodeNonRecur(root, 10));
 
-    printf("height: %d\n", getHeight(root));
+    rotateLeft(findNodeNonRecur(root, 60));
+    rotateRight(findNodeNonRecur(root, 80));
+    rotateRight(findNodeNonRecur(root, 90));
+
+    std::string message = "Batata waz here";
+    int fontSize = 50;
+
+    const int screenWidth = 800;
+    const int screenHeight = 450;
+
+    InitWindow(screenWidth, screenHeight, "binary search tree");
+
+    SetTargetFPS(60);
+
+    while (!WindowShouldClose()){
+        BeginDrawing();
+            ClearBackground(RAYWHITE);
+            drawBST(root, screenWidth / 2, screenHeight * 1 / 5, 100, 80, 20);
+        EndDrawing();
+    }
+
+    CloseWindow();
 
     return 0;
 }

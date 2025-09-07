@@ -31,9 +31,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="bst.c">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="bst.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
