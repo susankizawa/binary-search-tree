@@ -642,12 +642,17 @@ int main(){
     insertNodeNonRecur(root, 40);
     insertNodeNonRecur(root, 70);
 
+    /*
     rotateLeft(findNodeNonRecur(root, 20));
     rotateLeft(findNodeNonRecur(root, 10));
 
     rotateLeft(findNodeNonRecur(root, 60));
     rotateRight(findNodeNonRecur(root, 80));
     rotateRight(findNodeNonRecur(root, 90));
+    */
+
+    rotateLeft(findNodeNonRecur(root, 20));
+    rotateLeft(findNodeNonRecur(root, 30));
 
     std::string message = "Batata waz here";
     int fontSize = 50;
