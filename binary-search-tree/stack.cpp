@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "bst_non_recur.h"
+#include "bst.h"
 
 int stackIsFull(Stack* s){
     if(s->top == (MAX_SIZE - 1))

@@ -59,6 +59,7 @@ void drawBST(Node* root, int posX, int posY, int offsetX, int offsetY, int fontS
 }
 
 int main(){
+    /*
     Node* rootRec = createNode(10);
     Node* rootNonRec = createNode(10);
 
@@ -150,7 +151,8 @@ int main(){
 
     return 0;
 
-    /*
+    */
+
     Node* root = createNode(50);
 
     insertNode(root, 10);
@@ -162,17 +164,48 @@ int main(){
     insertNode(root, 40);
     insertNode(root, 70);
 
+    Node* n;
 
-    rotateLeft(findNode(root, 20));
-    rotateLeft(findNode(root, 10));
+    n = findNode(root, 10);
+    n->right = rotateLeft(n->right);
 
-    rotateLeft(findNode(root, 60));
-    rotateRight(findNode(root, 80));
-    rotateRight(findNode(root, 90));
+    n = findNode(root, 50);
+    n->left = rotateLeft(n->left);
 
+    n = findNode(root, 90);
+    n->left = doubleRotateRight(n->left);
 
-    rotateLeft(findNode(root, 20));
-    rotateLeft(findNode(root, 30));
+    n = findNode(root, 50);
+    n->right = rotateRight(n->right);
+
+    // do this to update node parent after rotating it
+    /*
+    Node* n = findNode(root, 20);
+    Node* p = n->parent;
+
+    if(p->left == n)
+       p->left = rotateLeft(n);
+    else
+        p->right = rotateLeft(n);
+    */
+
+    /*
+    n = findNode(root, 30);
+    p = n->parent;
+
+    if(p->left == n)
+       p->left = rotateLeft(n);
+    else
+        p->right = rotateLeft(n);
+    */
+
+    // do this if rotated node is root
+    /*
+    n = findNode(root, 50);
+    p = n->parent;
+
+    root = rotateLeft(n);
+    */
 
     std::string message = "Batata waz here";
 
@@ -193,6 +226,5 @@ int main(){
     CloseWindow();
 
     return 0;
-    */
-}
 
+}

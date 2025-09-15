@@ -288,7 +288,9 @@ Node* removeNode(Node* root, int value){
 }
 
 Node* rotateLeft(Node* p){
-    Node* parent = p->parent;
+    if(p == NULL || p->right == NULL)
+        return p;
+
     Node* z = p->right;
     Node* T2 = z->left;
 
@@ -296,24 +298,19 @@ Node* rotateLeft(Node* p){
     z->left = p;
     p->right = T2;
 
-    // updates childs' parents
+    // updates nodes' parents
+    z->parent = p->parent;
     p->parent = z;
     if(T2 != NULL)
         T2->parent = p;
-
-    // updates parent
-    if(parent){
-        if(parent->right == p)
-            parent->right = z;
-        else if(parent->left == p)
-            parent->left = z;
-    }
 
     return z;
 }
 
 Node* rotateRight(Node* p){
-    Node* parent = p->parent;
+    if(p == NULL || p->left == NULL)
+        return p;
+
     Node* z = p->left;
     Node* T2 = z->right;
 
@@ -321,29 +318,28 @@ Node* rotateRight(Node* p){
     z->right = p;
     p->left = T2;
 
-    // updates childs' parents
+    // updates nodes' parents
+    z->parent = p->parent;
     p->parent = z;
     if(T2 != NULL)
         T2->parent = p;
-
-    // updates parent
-    if(parent){
-        if(parent->right == p)
-            parent->right = z;
-        else if(parent->left == p)
-            parent->left = z;
-    }
 
     return z;
 }
 
 Node* doubleRotateLeft(Node* root){
-    rotateRight(root->right);
+    if(root == NULL || root->right == NULL)
+        return root;
+
+    root->right = rotateRight(root->right);
     return rotateLeft(root);
 }
 
 Node* doubleRotateRight(Node* root){
-    rotateLeft(root->left);
+    if(root == NULL || root->left == NULL)
+        return root;
+
+    root->left = rotateLeft(root->left);
     return rotateRight(root);
 }
 

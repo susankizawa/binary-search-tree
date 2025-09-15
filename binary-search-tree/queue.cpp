@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "bst_non_recur.h"
+#include "bst.h"
 
 int queueIsEmpty(Queue* q){
     return (q->size == 0);
