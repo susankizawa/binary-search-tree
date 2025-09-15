@@ -1,9 +1,10 @@
-#include "bst_non_recur.h"
+#include "bst.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
+#include <algorithm>
 #include "queue.h"
+#include "stack.h"
 
 Node* findMin(Node* root){
     if(root == NULL)
@@ -37,7 +38,7 @@ Node* findMax(Node* root){
     return current;
 }
 
-int getHeight(Node* root){
+int getHeightNonRecur(Node* root){
     if(root == NULL)
         return -1;
 
@@ -63,6 +64,13 @@ int getHeight(Node* root){
     return height;
 }
 
+int getHeight(Node* root){
+    if(root == NULL)
+        return -1;
+
+    return 1 + std::max(getHeight(root->left), getHeight(root->right));
+}
+
 int getBalanceFactor(Node* root){
     if(root == NULL)
         return 0;
@@ -78,7 +86,7 @@ Node* createNode(int value){
     return newNode;
 }
 
-Node* findNodeNonRecur(Node* root, int value){
+Node* findNode(Node* root, int value){
     Node* current = root;
 
     while(current != NULL){
@@ -150,12 +158,37 @@ Node* insertNodeNonRecur(Node* root, int value){
     return root;
 }
 
+Node* insertNode(Node* root, int value){
+    // if root is NULL, we found the spot for the new node
+    if(root == NULL){
+        Node* newNode = createNode(value);
+        return newNode;
+    }
+
+    // if value < root's value, go left
+    // if value > root's value, go right
+    // if value == root's value, do nothing (no duplicates)
+    if(value < root->value){
+        root->left = insertNode(root->left, value);
+        // updates parent
+        if(root->left->parent == NULL)
+            root->left->parent = root;
+    } else if(value > root->value){
+        root->right = insertNode(root->right, value);
+        //updates parent
+        if(root->right->parent == NULL)
+            root->right->parent = root;
+    }
+
+    return root;
+}
+
 Node* removeNodeNonRecur(Node* root, int value){
     if(root == NULL)
         return root;
 
     // finds node to be removed and it's parent
-    Node* node = findNodeNonRecur(root, value);
+    Node* node = findNode(root, value);
 
     if(node == NULL)
         return root;
@@ -198,28 +231,58 @@ Node* removeNodeNonRecur(Node* root, int value){
     }
     // Case 3: 2 children
     else{
-        // finds node of maximum value of left subtree (the in-order predecessor) and it's parent
-        Node* successor = findMax(node->left);
-        Node* successorParent = successor->parent;
+        // finds the in-order predecessor (max value in left subtree)and it's parent
+        Node* predecessor = findMax(node->left);
 
-        // updates successor's parent if it exists
-        if(successorParent != NULL){
-            successorParent->right = successor->left;
-        } else{
-            node->left = successor->left;
-        }
+        // updates parent
+        if(predecessor->parent == node)
+            node->left = predecessor->left;
+        else
+            predecessor->parent->right = predecessor->left;
 
-        // updates left child's parent if it exists
-        if(successor->left != NULL){
-            successor->left->parent = successorParent;
-        }
+        node->value = predecessor->value;
 
-        node->value = successor->value;
-
-        free(successor);
+        free(predecessor);
     }
 
-    free(node);
+    return root;
+}
+
+Node* removeNode(Node* root, int value){
+    if(root == NULL)
+        return root;
+
+    // traverse to find the target node
+    if(value < root->value)
+        root->left = removeNode(root->left, value);
+    else if(value > root->value)
+        root->right = removeNode(root->right, value);
+    // found the target node - handle deletion based on number of children
+    else{
+        // Case 1: No children
+        if(root->left == NULL && root->right == NULL){
+            free(root);
+            return NULL;
+        }
+        // Case 2: 1 child
+        else if(root->left == NULL || root->right == NULL){
+            Node* child = (root->left) ? root->left : root->right;
+            child->parent = root->parent;
+            free(root);
+            return child;
+        }
+        // Case 3: 2 children
+        else{
+            // find the in-order predecessor (max value in left subtree)
+            Node* predecessor = findMax(root->left);
+
+            // replace current node's value with predecessor's value
+            root->value = predecessor->value;
+
+            // remove the predecessor from left subtree
+            root->left = removeNode(root->left, predecessor->value);
+        }
+    }
 
     return root;
 }
@@ -284,7 +347,7 @@ Node* doubleRotateRight(Node* root){
     return rotateRight(root);
 }
 
-void preOrderPrint(Node* root){
+void preOrderPrintNonRecur(Node* root){
     if(root == NULL)
         return;
 
@@ -316,7 +379,18 @@ void preOrderPrint(Node* root){
     return;
 }
 
-void inOrderPrint(Node* root){
+void preOrderPrint(Node* root){
+    if(root == NULL)
+        return;
+
+    printNode(root);
+    preOrderPrint(root->left);
+    preOrderPrint(root->right);
+
+    return;
+}
+
+void inOrderPrintNonRecur(Node* root){
     if(root == NULL)
         return;
 
@@ -348,7 +422,18 @@ void inOrderPrint(Node* root){
     return;
 }
 
-void postOrderPrint(Node* root){
+void inOrderPrint(Node* root){
+    if(root == NULL)
+        return;
+
+    inOrderPrint(root->left);
+    printNode(root);
+    inOrderPrint(root->right);
+
+    return;
+}
+
+void postOrderPrintNonRecur(Node* root){
     if(root == NULL)
         return;
 
@@ -376,6 +461,17 @@ void postOrderPrint(Node* root){
 
     freeStack(s1);
     freeStack(s2);
+
+    return;
+}
+
+void postOrderPrint(Node* root){
+    if(root == NULL)
+        return;
+
+    postOrderPrint(root->left);
+    postOrderPrint(root->right);
+    printNode(root);
 
     return;
 }

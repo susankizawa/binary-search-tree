@@ -37,7 +37,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="bst.cpp" />
+		<Unit filename="bst_non_recur.cpp" />
+		<Unit filename="bst_non_recur.h" />
+		<Unit filename="config.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="queue.cpp" />
+		<Unit filename="queue.h" />
+		<Unit filename="stack.cpp" />
+		<Unit filename="stack.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
