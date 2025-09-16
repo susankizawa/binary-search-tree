@@ -155,28 +155,18 @@ int main(){
 
     Node* root = createNode(50);
 
-    insertNode(root, 10);
-    insertNode(root, 90);
-    insertNode(root, 20);
-    insertNode(root, 30);
-    insertNode(root, 80);
-    insertNode(root, 60);
     insertNode(root, 40);
+    insertNode(root, 10);
+    insertNode(root, 30);
+    insertNode(root, 60);
+    insertNode(root, 20);
+    insertNode(root, 80);
     insertNode(root, 70);
+    insertNode(root, 90);
 
-    Node* n;
+    balanceTree(root);
 
-    n = findNode(root, 10);
-    n->right = rotateLeft(n->right);
-
-    n = findNode(root, 50);
-    n->left = rotateLeft(n->left);
-
-    n = findNode(root, 90);
-    n->left = doubleRotateRight(n->left);
-
-    n = findNode(root, 50);
-    n->right = rotateRight(n->right);
+    //Node* n;
 
     // do this to update node parent after rotating it
     /*

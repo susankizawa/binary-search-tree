@@ -75,7 +75,7 @@ int getBalanceFactor(Node* root){
     if(root == NULL)
         return 0;
 
-    return (getHeight(root->right) - getHeight(root->left));
+    return (getHeight(root->left) - getHeight(root->right));
 }
 
 Node* createNode(int value){
@@ -341,6 +341,36 @@ Node* doubleRotateRight(Node* root){
 
     root->left = rotateLeft(root->left);
     return rotateRight(root);
+}
+
+Node* balanceTree(Node* root){
+    if(root == NULL)
+        return root;
+
+    root->left = balanceTree(root->left);
+    root->right = balanceTree(root->right);
+
+    int BF = getBalanceFactor(root);
+
+    if(BF > 1){
+        int leftChildBF = getBalanceFactor(root->left);
+
+        if(leftChildBF < 0){
+            return doubleRotateRight(root);
+        } else{
+            return rotateRight(root);
+        }
+    } else if(BF < -1){
+        int rightChildBF = getBalanceFactor(root->right);
+
+        if(rightChildBF > 0){
+            return doubleRotateLeft(root);
+        } else{
+            return rotateLeft(root);
+        }
+    }
+
+    return root;
 }
 
 void preOrderPrintNonRecur(Node* root){

@@ -40,6 +40,8 @@ Node* doubleRotateLeft(Node* root);
 
 Node* doubleRotateRight(Node* root);
 
+Node* balanceTree(Node* root);
+
 void preOrderPrintNonRecur(Node* root);
 
 void preOrderPrint(Node* root);
