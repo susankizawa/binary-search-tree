@@ -168,13 +168,6 @@ Node* insertNodeNonRecur(Node* root, int value){
         current->right = newNode;
     }
 
-    // updates nodes' heights
-    current = newNode;
-    while(current != NULL){
-        updateHeight(current);
-        current = current->parent;
-    }
-
     root = balanceTree(root);
 
     return root;
@@ -201,8 +194,6 @@ Node* insertNode(Node* root, int value){
         if(root->right->parent == NULL)
             root->right->parent = root;
     }
-
-    updateHeight(root);
 
     root = balanceTree(root);
 
@@ -234,13 +225,6 @@ Node* removeNodeNonRecur(Node* root, int value){
             root = NULL;
         }
 
-        // updates nodes' heights
-        Node* current = (parent == NULL)? root : parent;
-        while(current != NULL){
-            updateHeight(current);
-            current = current->parent;
-        }
-
         free(node);
     }
     // Case 2: 1 child
@@ -258,13 +242,6 @@ Node* removeNodeNonRecur(Node* root, int value){
                 parent->right = child;
         } else{
             root = child;
-        }
-
-        // updates nodes' heights
-        Node* current = (parent == NULL)? root : parent;
-        while(current != NULL){
-            updateHeight(current);
-            current = current->parent;
         }
 
         free(node);
@@ -285,13 +262,6 @@ Node* removeNodeNonRecur(Node* root, int value){
             predecessor->left->parent = predecessor->parent;
 
         node->value = predecessor->value;
-
-        // updates nodes' heights
-        Node* current = (predecessor->parent == NULL)? root : predecessor->parent;
-        while(current != NULL){
-            updateHeight(current);
-            current = current->parent;
-        }
 
         free(predecessor);
     }
@@ -338,8 +308,6 @@ Node* removeNode(Node* root, int value){
             root->left = removeNode(root->left, predecessor->value);
         }
     }
-
-    updateHeight(root);
 
     root = balanceTree(root);
 

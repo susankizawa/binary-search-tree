@@ -165,14 +165,14 @@ int main(){
 
     Node* root = createNode(50);
 
-    root = insertNode(root, 10);
-    root = insertNode(root, 20);
-    root = insertNode(root, 30);
-    root = insertNode(root, 40);
-    root = insertNode(root, 60);
-    root = insertNode(root, 70);
-    root = insertNode(root, 80);
-    root = insertNode(root, 90);
+    root = insertNodeNonRecur(root, 10);
+    root = insertNodeNonRecur(root, 20);
+    root = insertNodeNonRecur(root, 30);
+    root = insertNodeNonRecur(root, 40);
+    root = insertNodeNonRecur(root, 60);
+    root = insertNodeNonRecur(root, 70);
+    root = insertNodeNonRecur(root, 80);
+    root = insertNodeNonRecur(root, 90);
 
     //Node* n;
 
