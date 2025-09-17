@@ -3,6 +3,7 @@
 
 typedef struct Node{
     int value;
+    int height;
     struct Node* parent;
     struct Node* left;
     struct Node* right;
@@ -15,6 +16,8 @@ Node* findMax(Node* root);
 int getHeightNonRecur(Node* root);
 
 int getHeight(Node* root);
+
+void updateHeight(Node* node);
 
 int getBalanceFactor(Node* root);
 

@@ -16,9 +16,12 @@
 
 void drawNode(Node* node, int posX, int posY, int fontSize){
     char valString[20];
+    char heightString[20];
     snprintf(valString, sizeof(valString), "%d", node->value);
+    snprintf(heightString, sizeof(heightString), "%d", node->height);
     int textHeight = fontSize;
     int textWidth = MeasureText(valString, fontSize);
+    int heightTextWidth = MeasureText(heightString, fontSize);
     int textMax = std::max(textWidth, textHeight);
     int radius = (textMax / 2) + 10; // radius is half of the larger dimension + some padding
 
@@ -30,6 +33,13 @@ void drawNode(Node* node, int posX, int posY, int fontSize){
     DrawText(valString,
              posX - (textWidth / 2),
              posY - (textHeight / 2),
+             fontSize,
+             BLACK);
+
+    // draws height
+    DrawText(heightString,
+             posX - (heightTextWidth / 2),
+             posY - 25 - (textHeight),
              fontSize,
              BLACK);
 
@@ -155,13 +165,13 @@ int main(){
 
     Node* root = createNode(50);
 
-    insertNode(root, 40);
     insertNode(root, 10);
-    insertNode(root, 30);
-    insertNode(root, 60);
     insertNode(root, 20);
-    insertNode(root, 80);
+    insertNode(root, 30);
+    insertNode(root, 40);
+    insertNode(root, 60);
     insertNode(root, 70);
+    insertNode(root, 80);
     insertNode(root, 90);
 
     balanceTree(root);

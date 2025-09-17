@@ -71,6 +71,18 @@ int getHeight(Node* root){
     return 1 + std::max(getHeight(root->left), getHeight(root->right));
 }
 
+void updateHeight(Node* node){
+    if(node == NULL)
+        return;
+
+    int leftHeight = (node->left)? node->left->height : -1;
+    int rightHeight = (node->right)? node->right->height : -1;
+
+    node->height = 1 + std::max(leftHeight, rightHeight);
+
+    return;
+}
+
 int getBalanceFactor(Node* root){
     if(root == NULL)
         return 0;
@@ -81,6 +93,7 @@ int getBalanceFactor(Node* root){
 Node* createNode(int value){
     Node* newNode = (Node*)malloc(sizeof(Node));
     newNode->value = value;
+    newNode->height = 0;
     newNode->parent = NULL;
     newNode->left = newNode->right = NULL;
     return newNode;
@@ -147,12 +160,19 @@ Node* insertNodeNonRecur(Node* root, int value){
         }
     }
 
-    // Inserts new node in the free spot
+    // inserts new node in the free spot
     newNode->parent = current;
     if(value < current->value){
         current->left = newNode;
     } else {
         current->right = newNode;
+    }
+
+    // updates nodes' heights
+    current = newNode;
+    while(current != NULL){
+        updateHeight(current);
+        current = current->parent;
     }
 
     return root;
@@ -179,6 +199,8 @@ Node* insertNode(Node* root, int value){
         if(root->right->parent == NULL)
             root->right->parent = root;
     }
+
+    updateHeight(root);
 
     return root;
 }
@@ -208,6 +230,13 @@ Node* removeNodeNonRecur(Node* root, int value){
             root = NULL;
         }
 
+        // updates nodes' heights
+        Node* current = (parent == NULL)? root : parent;
+        while(current != NULL){
+            updateHeight(current);
+            current = current->parent;
+        }
+
         free(node);
     }
     // Case 2: 1 child
@@ -227,6 +256,13 @@ Node* removeNodeNonRecur(Node* root, int value){
             root = child;
         }
 
+        // updates nodes' heights
+        Node* current = (parent == NULL)? root : parent;
+        while(current != NULL){
+            updateHeight(current);
+            current = current->parent;
+        }
+
         free(node);
     }
     // Case 3: 2 children
@@ -240,7 +276,18 @@ Node* removeNodeNonRecur(Node* root, int value){
         else
             predecessor->parent->right = predecessor->left;
 
+        // update the left child's parent pointer
+        if(predecessor->left != NULL)
+            predecessor->left->parent = predecessor->parent;
+
         node->value = predecessor->value;
+
+        // updates nodes' heights
+        Node* current = (predecessor->parent == NULL)? root : predecessor->parent;
+        while(current != NULL){
+            updateHeight(current);
+            current = current->parent;
+        }
 
         free(predecessor);
     }
@@ -253,10 +300,12 @@ Node* removeNode(Node* root, int value){
         return root;
 
     // traverse to find the target node
-    if(value < root->value)
+    if(value < root->value){
         root->left = removeNode(root->left, value);
-    else if(value > root->value)
+    }
+    else if(value > root->value){
         root->right = removeNode(root->right, value);
+    }
     // found the target node - handle deletion based on number of children
     else{
         // Case 1: No children
@@ -284,6 +333,8 @@ Node* removeNode(Node* root, int value){
         }
     }
 
+    updateHeight(root);
+
     return root;
 }
 
@@ -304,6 +355,9 @@ Node* rotateLeft(Node* p){
     if(T2 != NULL)
         T2->parent = p;
 
+    updateHeight(p);
+    updateHeight(z);
+
     return z;
 }
 
@@ -323,6 +377,9 @@ Node* rotateRight(Node* p){
     p->parent = z;
     if(T2 != NULL)
         T2->parent = p;
+
+    updateHeight(p);
+    updateHeight(z);
 
     return z;
 }
@@ -369,6 +426,8 @@ Node* balanceTree(Node* root){
             return rotateLeft(root);
         }
     }
+
+    updateHeight(root);
 
     return root;
 }
