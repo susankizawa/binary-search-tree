@@ -175,6 +175,8 @@ Node* insertNodeNonRecur(Node* root, int value){
         current = current->parent;
     }
 
+    root = balanceTree(root);
+
     return root;
 }
 
@@ -201,6 +203,8 @@ Node* insertNode(Node* root, int value){
     }
 
     updateHeight(root);
+
+    root = balanceTree(root);
 
     return root;
 }
@@ -292,6 +296,8 @@ Node* removeNodeNonRecur(Node* root, int value){
         free(predecessor);
     }
 
+    root = balanceTree(root);
+
     return root;
 }
 
@@ -334,6 +340,8 @@ Node* removeNode(Node* root, int value){
     }
 
     updateHeight(root);
+
+    root = balanceTree(root);
 
     return root;
 }

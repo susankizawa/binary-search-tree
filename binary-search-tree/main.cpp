@@ -165,16 +165,14 @@ int main(){
 
     Node* root = createNode(50);
 
-    insertNode(root, 10);
-    insertNode(root, 20);
-    insertNode(root, 30);
-    insertNode(root, 40);
-    insertNode(root, 60);
-    insertNode(root, 70);
-    insertNode(root, 80);
-    insertNode(root, 90);
-
-    balanceTree(root);
+    root = insertNode(root, 10);
+    root = insertNode(root, 20);
+    root = insertNode(root, 30);
+    root = insertNode(root, 40);
+    root = insertNode(root, 60);
+    root = insertNode(root, 70);
+    root = insertNode(root, 80);
+    root = insertNode(root, 90);
 
     //Node* n;
 
