@@ -3,9 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-File* createFile(std::string fileName, size_t size){
+File* createFile(std::string fileName, int fileSize){
     if(fileName == ""){
         printf("error: fileName missing\n");
+        return NULL;
+    }
+
+    if(fileSize < 0){
+        printf("error: size needs to be a positive number\n");
         return NULL;
     }
 
@@ -21,14 +26,14 @@ File* createFile(std::string fileName, size_t size){
             newFile->extension = "";
         }
 
-        newFile->size = size;
+        newFile->size = static_cast<size_t>(fileSize);
     }
     return newFile;
 }
 
 void printFile(File* f){
     if(f == NULL){
-        printf("[ NULL ]");
+        printf("[ NULL ]\n");
         return;
     }
 
@@ -42,7 +47,7 @@ void printFile(File* f){
         printf("\n");
     }
     printf(" size: ");
-    printf("%d", f->size);
+    printf("%zu", f->size);
     printf("\n");
     printf("]\n");
 

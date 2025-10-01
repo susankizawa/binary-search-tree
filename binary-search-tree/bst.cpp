@@ -128,7 +128,7 @@ Node* findNode(Node* root, int id){
 
 void printNode(Node* n){
     if(n == NULL){
-        printf("[ NULL ]");
+        printf("[ NULL ]\n");
         return;
     }
 

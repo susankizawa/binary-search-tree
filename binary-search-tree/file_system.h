@@ -9,7 +9,7 @@ typedef struct File{
     size_t size;
 } File;
 
-File* createFile(std::string fileName, size_t size);
+File* createFile(std::string fileName, int size);
 
 void printFile(File* f);
 

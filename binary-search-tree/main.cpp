@@ -72,12 +72,14 @@ void drawBST(Node* root, int posX, int posY, int offsetX, int offsetY, int fontS
 int main(){
 
     File* f1 = createFile("", -21);
-    File* f2 = createFile("batata", 10);
-    File* f3 = createFile("pao de queijo.txt", 0);
+    File* f2 = createFile("bob", -21);
+    File* f3 = createFile("batata", 10);
+    File* f4 = createFile("pao de queijo.txt", 0);
 
     printFile(f1);
     printFile(f2);
     printFile(f3);
+    printFile(f4);
 
     /*
     Node* root = createNode(1, createFile());
