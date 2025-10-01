@@ -8,14 +8,96 @@
 
 // Todo
 
-// getHeight ok
-// getBalanceFactor ok
-// rotateLeft
-// rotateRight
-// doubleRotateLeft
-// doubleRotateRight
+// store file
+// search file
+// remove file
+// show tree
 
-void drawNode(Node* node, int posX, int posY, int fontSize){
+enum Anchor {
+    TOP_LEFT,
+    CENTER
+};
+
+void drawNode(Node* node, int posX, int posY, Anchor anchor = CENTER, int fontSize = FONT_SIZE){
+    int width, height, anchorX, anchorY, boxX, boxY;
+    int paddingX = 10;
+    int paddingY = 10;
+    int spacing = 5;
+    int lineHeight = fontSize + spacing;
+
+    const char* lines[4] = {
+        TextFormat("id: %d", node->id),
+        TextFormat("name: %s", node->file->name.c_str()),
+        TextFormat("extension: %s", node->file->extension.c_str()),
+        TextFormat("size: %zu", node->file->size)
+    };
+
+    // Find max text width
+    int maxTextWidth = 0;
+    for(int i = 0; i < 4; i++){
+        int w = MeasureText(lines[i], fontSize);
+        if (w > maxTextWidth)
+            maxTextWidth = w;
+    }
+
+    width = maxTextWidth + 2 * paddingX;
+    height = 4 * lineHeight + 2 * paddingY;
+
+    switch(anchor){
+        case TOP_LEFT:
+            anchorX = posX;
+            anchorY = posY;
+            break;
+        case CENTER:
+            anchorX = posX - width / 2;
+            anchorY = posY - height / 2;
+            break;
+    }
+
+    boxX = anchorX - paddingX;
+    boxY = anchorY - paddingY;
+
+    // draws rectangle outline
+    DrawRectangle(boxX,
+                  boxY,
+                  width,
+                  height,
+                  LIGHTGRAY);
+    DrawRectangleLines(boxX,
+                       boxY,
+                       width,
+                       height,
+                       BLACK);
+
+    // converts ints into strings
+    char idStr[20], sizeStr[20];
+    snprintf(idStr, sizeof(idStr), "%d", node->id);
+    snprintf(sizeStr, sizeof(sizeStr), "%d", node->file->size);
+
+    // writes node data
+    for(int i = 0; i < 4; i++){
+        if(i == 0){
+            DrawText(lines[i],
+             anchorX,
+             anchorY + lineHeight * i,
+             fontSize,
+             BLACK);
+        } else{
+            DrawText(lines[i],
+             anchorX,
+             anchorY + lineHeight * i + paddingY,
+             fontSize,
+             BLACK);
+        }
+    }
+
+    DrawLine(boxX,
+             boxY + lineHeight + paddingY,
+             boxX + width,
+             boxY + lineHeight + paddingY,
+             BLACK);
+
+    /*
     char valString[20];
     char heightString[20];
     snprintf(valString, sizeof(valString), "%d", node->id);
@@ -43,6 +125,7 @@ void drawNode(Node* node, int posX, int posY, int fontSize){
              posY - 25 - (textHeight),
              fontSize,
              BLACK);
+    */
 
     return;
 }
@@ -64,37 +147,29 @@ void drawBST(Node* root, int posX, int posY, int offsetX, int offsetY, int fontS
         drawBST(root->right, rightChildX, rightChildY, offsetX / 2, offsetY, fontSize);
     }
 
-    drawNode(root, posX, posY, fontSize);
+    drawNode(root, posX, posY, CENTER, fontSize);
 
     return;
 }
 
 int main(){
 
-    File* f1 = createFile("", -21);
-    File* f2 = createFile("bob", -21);
-    File* f3 = createFile("batata", 10);
-    File* f4 = createFile("pao de queijo.txt", 0);
-
-    printFile(f1);
-    printFile(f2);
-    printFile(f3);
-    printFile(f4);
-
     /*
-    Node* root = createNode(1, createFile());
+    Node* root = createNode(1, createFile("bom.txt", 0));
 
-    root = insertNodeNonRecur(root, 10);
-    root = insertNodeNonRecur(root, 2);
-    root = insertNodeNonRecur(root, 9);
-    root = insertNodeNonRecur(root, 3);
-    root = insertNodeNonRecur(root, 8);
-    root = insertNodeNonRecur(root, 4);
-    root = insertNodeNonRecur(root, 7);
-    root = insertNodeNonRecur(root, 6);
-    root = insertNodeNonRecur(root, 5);
+    root = insertNodeNonRecur(root, 3, createFile("dia.png", 20));
+    root = insertNodeNonRecur(root, 5, createFile("povo.json", 20));
+    root = insertNodeNonRecur(root, 4, createFile("batata.cpp", 45));
 
     */
+
+    Node* root = createNode(1, createFile("never.txt", 0));
+
+    root = insertNodeNonRecur(root, 2, createFile("gonna.txt", 10));
+    root = insertNodeNonRecur(root, 3, createFile("give.png", 20));
+    root = insertNodeNonRecur(root, 5, createFile("up.json", 20));
+    root = insertNodeNonRecur(root, 4, createFile("you.cpp", 45));
+
 
 
     const int screenWidth = 800;
@@ -107,7 +182,7 @@ int main(){
     while (!WindowShouldClose()){
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            //drawBST(root, screenWidth / 2, screenHeight * 1 / 5, 100, 80, 20);
+            drawBST(root, screenWidth / 2, screenHeight * 1 / 5, 200, 160, 20);
         EndDrawing();
     }
 
