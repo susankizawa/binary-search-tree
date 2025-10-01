@@ -1,8 +1,11 @@
 #ifndef BST_H
 #define BST_H
 
+#include "file_system.h"
+
 typedef struct Node{
-    int value;
+    int id;
+    File* file;
     int height;
     struct Node* parent;
     struct Node* left;
@@ -21,19 +24,19 @@ void updateHeight(Node* node);
 
 int getBalanceFactor(Node* root);
 
-Node* createNode(int value);
+Node* createNode(int id, File* file);
 
-Node* findNode(Node* root, int value);
+Node* findNode(Node* root, int id);
 
 void printNode(Node* n);
 
-Node* insertNodeNonRecur(Node* root, int value);
+Node* insertNodeNonRecur(Node* root, int id, File* file);
 
-Node* insertNode(Node* root, int value);
+Node* insertNode(Node* root, int id, File* file);
 
-Node* removeNodeNonRecur(Node* root, int value);
+Node* removeNodeNonRecur(Node* root, int id);
 
-Node* removeNode(Node* root, int value);
+Node* removeNode(Node* root, int id);
 
 Node* rotateLeft(Node* p);
 

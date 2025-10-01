@@ -4,6 +4,7 @@
 #include "raylib.h"
 #include "config.h"
 #include "bst.h"
+#include "file_system.h"
 
 // Todo
 
@@ -17,7 +18,7 @@
 void drawNode(Node* node, int posX, int posY, int fontSize){
     char valString[20];
     char heightString[20];
-    snprintf(valString, sizeof(valString), "%d", node->value);
+    snprintf(valString, sizeof(valString), "%d", node->id);
     snprintf(heightString, sizeof(heightString), "%d", node->height);
     int textHeight = fontSize;
     int textWidth = MeasureText(valString, fontSize);
@@ -69,143 +70,30 @@ void drawBST(Node* root, int posX, int posY, int offsetX, int offsetY, int fontS
 }
 
 int main(){
+
+    File* f1 = createFile("", -21);
+    File* f2 = createFile("batata", 10);
+    File* f3 = createFile("pao de queijo.txt", 0);
+
+    printFile(f1);
+    printFile(f2);
+    printFile(f3);
+
     /*
-    Node* rootRec = createNode(10);
-    Node* rootNonRec = createNode(10);
-
-    printf("--- Building trees ---\n");
-
-    // Build recursive tree
-    insertNode(rootRec, 5);
-    insertNode(rootRec, 15);
-    insertNode(rootRec, 3);   // leaf
-    insertNode(rootRec, 7);   // will have one child
-    insertNode(rootRec, 6);   // child of 7
-    insertNode(rootRec, 13);
-    insertNode(rootRec, 17);
-
-    // Build non-recursive tree (same structure)
-    insertNodeNonRecur(rootNonRec, 5);
-    insertNodeNonRecur(rootNonRec, 15);
-    insertNodeNonRecur(rootNonRec, 3);
-    insertNodeNonRecur(rootNonRec, 7);
-    insertNodeNonRecur(rootNonRec, 6);
-    insertNodeNonRecur(rootNonRec, 13);
-    insertNodeNonRecur(rootNonRec, 17);
-
-    printf("\nRecursive tree (in-order): ");
-    inOrderPrint(rootRec);
-    printf("\nNon-recursive tree (in-order): ");
-    inOrderPrintNonRecur(rootNonRec);
-    printf("\n\n");
-
-    printf("Tree built.\n");
-
-    // --- Duplicate insert test ---
-    printf("Recursive insert duplicate (10):\n");
-    insertNode(rootRec, 10);   // test duplicate insert
-    inOrderPrint(rootRec);
-    printf("\n");
-
-    printf("Non recursively insert duplicate (10):\n");
-    insertNodeNonRecur(rootNonRec, 10);   // test duplicate insert
-    inOrderPrintNonRecur(rootNonRec);
-    printf("\n");
-
-    // --- Height tests ---
-    printf("Height (recursive): %d\n", getHeight(rootRec));
-    printf("Height (non-recursive): %d\n\n", getHeightNonRecur(rootNonRec));
-
-    printf("Empty tree height (recursive): %d\n", getHeight(NULL));
-    printf("Empty tree height (non-recursive): %d\n\n", getHeightNonRecur(NULL));
-
-    // --- Traversal tests ---
-    printf("PreOrder (recursive): ");
-    preOrderPrint(rootRec);
-    printf("\nPreOrder (non-recursive): ");
-    preOrderPrintNonRecur(rootNonRec);
-
-    printf("\n\nInOrder (recursive): ");
-    inOrderPrint(rootRec);
-    printf("\nInOrder (non-recursive): ");
-    inOrderPrintNonRecur(rootNonRec);
-
-    printf("\n\nPostOrder (recursive): ");
-    postOrderPrint(rootRec);
-    printf("\nPostOrder (non-recursive): ");
-    postOrderPrintNonRecur(rootNonRec);
-
-    printf("\n\nLevelOrder (recursive tree only): ");
-    levelOrderPrint(rootRec);
-    printf("\n\n");
-
-    // --- Deletion tests ---
-    printf("Recursive deletions:\n");
-    removeNode(rootRec, 3);   // leaf
-    removeNode(rootRec, 7);   // one child
-    removeNode(rootRec, 15);  // two children
-    removeNode(rootRec, 99);  // not found
-    levelOrderPrint(rootRec);
-    printf("\n");
-
-    printf("Non-recursive deletions:\n");
-    removeNodeNonRecur(rootNonRec, 3);   // leaf
-    removeNodeNonRecur(rootNonRec, 7);   // one child
-    removeNodeNonRecur(rootNonRec, 15);  // two children
-    removeNodeNonRecur(rootNonRec, 99);  // not found
-    levelOrderPrint(rootNonRec);
-    printf("\n");
-
-    printf("\nPress any button to conclude the test");
-    getchar();
-
-    return 0;
-
-    */
-
-    Node* root = createNode(50);
+    Node* root = createNode(1, createFile());
 
     root = insertNodeNonRecur(root, 10);
-    root = insertNodeNonRecur(root, 20);
-    root = insertNodeNonRecur(root, 30);
-    root = insertNodeNonRecur(root, 40);
-    root = insertNodeNonRecur(root, 60);
-    root = insertNodeNonRecur(root, 70);
-    root = insertNodeNonRecur(root, 80);
-    root = insertNodeNonRecur(root, 90);
+    root = insertNodeNonRecur(root, 2);
+    root = insertNodeNonRecur(root, 9);
+    root = insertNodeNonRecur(root, 3);
+    root = insertNodeNonRecur(root, 8);
+    root = insertNodeNonRecur(root, 4);
+    root = insertNodeNonRecur(root, 7);
+    root = insertNodeNonRecur(root, 6);
+    root = insertNodeNonRecur(root, 5);
 
-    //Node* n;
-
-    // do this to update node parent after rotating it
-    /*
-    Node* n = findNode(root, 20);
-    Node* p = n->parent;
-
-    if(p->left == n)
-       p->left = rotateLeft(n);
-    else
-        p->right = rotateLeft(n);
     */
 
-    /*
-    n = findNode(root, 30);
-    p = n->parent;
-
-    if(p->left == n)
-       p->left = rotateLeft(n);
-    else
-        p->right = rotateLeft(n);
-    */
-
-    // do this if rotated node is root
-    /*
-    n = findNode(root, 50);
-    p = n->parent;
-
-    root = rotateLeft(n);
-    */
-
-    std::string message = "Batata waz here";
 
     const int screenWidth = 800;
     const int screenHeight = 450;
@@ -217,7 +105,7 @@ int main(){
     while (!WindowShouldClose()){
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            drawBST(root, screenWidth / 2, screenHeight * 1 / 5, 100, 80, 20);
+            //drawBST(root, screenWidth / 2, screenHeight * 1 / 5, 100, 80, 20);
         EndDrawing();
     }
 
