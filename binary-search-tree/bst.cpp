@@ -419,8 +419,6 @@ Node* doubleRotateRight(Node* root){
     return rotateRight(root);
 }
 
-int rotations = 0;
-
 Node* balanceTree(Node* root){
     if(root == NULL)
         return root;
@@ -434,29 +432,21 @@ Node* balanceTree(Node* root){
         int leftChildBF = getBalanceFactor(root->left);
 
         if(leftChildBF < 0){
-            rotations++;
             return doubleRotateRight(root);
         } else{
-            rotations++;
             return rotateRight(root);
         }
     } else if(BF < -1){
         int rightChildBF = getBalanceFactor(root->right);
 
         if(rightChildBF > 0){
-            rotations++;
             return doubleRotateLeft(root);
         } else{
-            rotations++;
             return rotateLeft(root);
         }
     }
 
     updateHeight(root);
-    if(rotations > 0){
-        printf("Debug: %d rotations done\n", rotations);
-        rotations = 0;
-    }
 
     return root;
 }
