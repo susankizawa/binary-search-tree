@@ -18,6 +18,38 @@ enum Anchor {
     CENTER
 };
 
+enum SystemScreen {
+    NONE = -1,
+    MENU,
+    EXIT_REQUESTED,
+    STORE_FILE,
+    FIND_FILE,
+    REMOVE_FILE,
+    TREE
+};
+
+struct MenuButton {
+    const char* label;
+    SystemScreen screen;
+    Rectangle rect;
+};
+
+// const variables
+int const NUM_BUTTONS = 5;
+
+// variables that need to persist
+MenuButton menuButtons[] = {
+    { "Store file", STORE_FILE, { 0 } },
+    { "Find file", FIND_FILE, { 0 } },
+    { "Remove file", REMOVE_FILE, { 0 } },
+    { "View tree", TREE, { 0 } },
+    { "Exit", EXIT_REQUESTED, { 0 } }
+};
+SystemScreen currentScreen;
+int selectedButton, mouseHoverRec;
+Node* root;
+bool exitWindow;
+
 void drawNode(Node* node, int posX, int posY, Anchor anchor = CENTER, int fontSize = FONT_SIZE){
     int width, height, anchorX, anchorY, boxX, boxY;
     int paddingX = 10;
@@ -97,36 +129,6 @@ void drawNode(Node* node, int posX, int posY, Anchor anchor = CENTER, int fontSi
              boxY + lineHeight + paddingY,
              BLACK);
 
-    /*
-    char valString[20];
-    char heightString[20];
-    snprintf(valString, sizeof(valString), "%d", node->id);
-    snprintf(heightString, sizeof(heightString), "%d", node->height);
-    int textHeight = fontSize;
-    int textWidth = MeasureText(valString, fontSize);
-    int heightTextWidth = MeasureText(heightString, fontSize);
-    int textMax = std::max(textWidth, textHeight);
-    int radius = (textMax / 2) + 10; // radius is half of the larger dimension + some padding
-
-    // draws circle
-    DrawCircle(posX, posY, radius, LIGHTGRAY);
-    DrawCircleLines(posX, posY, radius, BLACK);
-
-    // draws centered text
-    DrawText(valString,
-             posX - (textWidth / 2),
-             posY - (textHeight / 2),
-             fontSize,
-             BLACK);
-
-    // draws height
-    DrawText(heightString,
-             posX - (heightTextWidth / 2),
-             posY - 25 - (textHeight),
-             fontSize,
-             BLACK);
-    */
-
     return;
 }
 
@@ -152,6 +154,181 @@ void drawBST(Node* root, int posX, int posY, int offsetX, int offsetY, int fontS
     return;
 }
 
+void initMenuScreen(){
+    currentScreen = MENU;
+    selectedButton = 0;
+    mouseHoverRec = NONE;
+    for(int i = 0; i < NUM_BUTTONS; i++)
+        menuButtons[i].rect = (Rectangle) { GetScreenWidth() / 2 - 75, (float)(GetScreenHeight() * 2 / 6 + 50*i), 150.0f, FONT_SIZE + 20 };
+    return;
+}
+
+void initExitScreen(){
+    exitWindow = false;    // Flag to set window to exit
+}
+
+void handleMenuScreen(){
+    Vector2 mouse = GetMousePosition();
+
+    if (WindowShouldClose() || IsKeyPressed(KEY_ESCAPE))
+        currentScreen = EXIT_REQUESTED;
+
+    // Mouse hover & selection
+    for (int i = 0; i < NUM_BUTTONS; i++) {
+        if (CheckCollisionPointRec(mouse, menuButtons[i].rect)) {
+            mouseHoverRec = i;
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+                selectedButton = i;
+                currentScreen = menuButtons[selectedButton].screen;
+            }
+            break;
+        }
+    }
+
+    // Keyboard toggle group logic
+    if (IsKeyPressed(KEY_DOWN))
+        selectedButton++;
+    if (IsKeyPressed(KEY_UP))
+        selectedButton--;
+
+    selectedButton = (selectedButton + NUM_BUTTONS) % NUM_BUTTONS;
+
+    // Button activation
+    if (IsKeyPressed(KEY_ENTER)) {
+        currentScreen = menuButtons[selectedButton].screen;
+    }
+
+    return;
+}
+
+void handleExitScreen(){
+    if (currentScreen == EXIT_REQUESTED){
+        if (IsKeyPressed(KEY_Y))
+            exitWindow = true;
+        else if (IsKeyPressed(KEY_N))
+            currentScreen = MENU;
+    }
+
+    return;
+}
+
+void handleStoreFileScreen(){
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        currentScreen = MENU;
+    }
+
+    return;
+}
+
+void handleFindFileScreen(){
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        currentScreen = MENU;
+    }
+
+    return;
+}
+
+void handleRemoveFileScreen(){
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        currentScreen = MENU;
+    }
+
+    return;
+}
+
+void handleTreeScreen(){
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        currentScreen = MENU;
+    }
+
+    return;
+}
+
+void drawMenuScreen(){
+    char* title = "AVL File System";
+    int titleSize = FONT_SIZE * 2;
+    int titleWidth = MeasureText(title, titleSize);
+
+    DrawText(title, GetScreenWidth() / 2 - titleWidth / 2, GetScreenHeight() * 1 / 6, titleSize, DARKGRAY);
+
+    // Draw rectangles
+    for(int i = 0; i < NUM_BUTTONS; i++){
+        // selected button, regardless of mouse hover -> skyblue background, blue outline, dark blue text
+        // hovered button -> blue background, darkblue outline, black text
+        // unfocused button -> light gray background, gray outline, dark gray text
+        MenuButton button = menuButtons[i];
+        DrawRectangleRec(button.rect, (i == selectedButton) ? SKYBLUE : (i == mouseHoverRec) ? BLUE : LIGHTGRAY);
+        DrawRectangleLines((int) button.rect.x,
+                           (int) button.rect.y,
+                           (int) button.rect.width,
+                           (int) button.rect.height,
+                           (i == selectedButton) ? BLUE : (i == mouseHoverRec) ? DARKBLUE : GRAY);
+        DrawText(button.label,
+                (int) (button.rect.x + button.rect.width / 2 - MeasureText(button.label, FONT_SIZE) / 2),
+                (int) button.rect.y + 10,
+                FONT_SIZE,
+                (i == selectedButton) ? DARKBLUE : (i == mouseHoverRec) ? BLACK : DARKGRAY);
+    }
+
+    return;
+}
+
+void drawExitScreen(){
+    DrawRectangle(0, 100, GetScreenWidth(), 200, BLACK);
+    DrawText("Are you sure you want to exit program? [Y/N]", 40, 180, 30, WHITE);
+
+    return;
+}
+
+void drawStoreFileScreen(){
+    char* returnText = "Press ESC to return to main menu";
+
+    char* text = "Store File Screen";
+
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), GREEN);
+
+    DrawText(returnText, GetScreenWidth() / 2 - MeasureText(returnText, FONT_SIZE) / 2, 20, FONT_SIZE, DARKGRAY);
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, FONT_SIZE) / 2, GetScreenHeight() / 2, FONT_SIZE, DARKGREEN);
+    return;
+}
+
+void drawFindFileScreen(){
+    char* returnText = "Press ESC to return to main menu";
+
+    char* text = "Find File Screen";
+
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), YELLOW);
+
+    DrawText(returnText, GetScreenWidth() / 2 - MeasureText(returnText, FONT_SIZE) / 2, 20, FONT_SIZE, DARKGRAY);
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, FONT_SIZE) / 2, GetScreenHeight() / 2, FONT_SIZE, DARKBROWN);
+    return;
+}
+
+void drawRemoveFileScreen(){
+    char* returnText = "Press ESC to return to main menu";
+
+    char* text = "Remove File Screen";
+
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), RED);
+
+    DrawText(returnText, GetScreenWidth() / 2 - MeasureText(returnText, FONT_SIZE) / 2, 20, FONT_SIZE, DARKGRAY);
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, FONT_SIZE) / 2, GetScreenHeight() / 2, FONT_SIZE, MAROON);
+
+    return;
+}
+
+void drawTreeScreen(){
+    char* returnText = "Press ESC to return to main menu";
+    char* title = "View Tree";
+
+    drawBST(root, GetScreenWidth() / 2, 140, 110, 110, 10);
+
+    DrawText(returnText, GetScreenWidth() / 2 - MeasureText(returnText, FONT_SIZE) / 2, 20, FONT_SIZE, DARKGRAY);
+    DrawText(title, GetScreenWidth() / 2 - MeasureText(title, FONT_SIZE) / 2, 50, FONT_SIZE, DARKGRAY);
+
+    return;
+}
+
 int main(){
 
     /*
@@ -163,26 +340,72 @@ int main(){
 
     */
 
-    Node* root = createNode(1, createFile("never.txt", 0));
+    root = createNode(1, createFile("never.txt", 0));
 
     root = insertNodeNonRecur(root, 2, createFile("gonna.txt", 10));
     root = insertNodeNonRecur(root, 3, createFile("give.png", 20));
     root = insertNodeNonRecur(root, 5, createFile("up.json", 20));
     root = insertNodeNonRecur(root, 4, createFile("you.cpp", 45));
 
-
+    Node* node = findNode(root, 5);
 
     const int screenWidth = 800;
     const int screenHeight = 450;
 
     InitWindow(screenWidth, screenHeight, "binary search tree");
+    SetExitKey(KEY_NULL);  // disables automatic ESC exit
+
+    initMenuScreen();
+    initExitScreen();
 
     SetTargetFPS(60);
 
-    while (!WindowShouldClose()){
+    while (!exitWindow){
+
+        switch(currentScreen){
+            case MENU:
+                handleMenuScreen();
+                break;
+            case EXIT_REQUESTED:
+                handleExitScreen();
+                break;
+            case STORE_FILE:
+                handleStoreFileScreen();
+                break;
+            case FIND_FILE:
+                handleFindFileScreen();
+                break;
+            case REMOVE_FILE:
+                handleRemoveFileScreen();
+                break;
+            case TREE:
+                handleTreeScreen();
+                break;
+        }
+
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            drawBST(root, screenWidth / 2, screenHeight * 1 / 5, 200, 160, 20);
+            switch(currentScreen){
+                case MENU:
+                    drawMenuScreen();
+                    break;
+                case EXIT_REQUESTED:
+                    drawExitScreen();
+                    break;
+                case STORE_FILE:
+                    drawStoreFileScreen();
+                    break;
+                case FIND_FILE:
+                    drawFindFileScreen();
+                    break;
+                case REMOVE_FILE:
+                    drawRemoveFileScreen();
+                    break;
+                case TREE:
+                    drawTreeScreen();
+                    break;
+            }
+
         EndDrawing();
     }
 
