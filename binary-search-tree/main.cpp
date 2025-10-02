@@ -736,7 +736,7 @@ int main(){
 
     Node* foundFile = NULL;
 
-    InitWindow(screenWidth, screenHeight, "binary search tree");
+    InitWindow(screenWidth, screenHeight, "AVL File System");
     SetExitKey(KEY_NULL);  // disables automatic ESC exit
 
     initMenuScreen();
